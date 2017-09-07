@@ -114,10 +114,12 @@ cmu_base_addr:
 	ADD	R2,	R1,	R0
 	MOV	R3,	0b11110000000
 	STR	R3,	[R2]
+	//Set pins 
 	// Enable interrupt vector
 	LDR	R0,	=ISER0
 	MOV	R1, 	0x802
-	b .  // do nothing
+	
+	b . 
 	
 	/////////////////////////////////////////////////////////////////////////////
 	//
@@ -128,7 +130,7 @@ cmu_base_addr:
 	
         .thumb_func
 gpio_handler:  
-
+	
 	      b .  // do nothing
 	
 	/////////////////////////////////////////////////////////////////////////////
