@@ -31,7 +31,8 @@
 
 	      /* External Interrupts */
 	      .long   dummy_handler
-	      .long   gpio_handler_even            /* GPIO even handler */
+	      .long   gpio_handler_even          /* GPIO even handler */
+			
 	      .long   dummy_handler
 	      .long   dummy_handler
 	      .long   dummy_handler
@@ -41,34 +42,9 @@
 	      .long   dummy_handler
 	      .long   dummy_handler
 	      .long   dummy_handler
-	      .long   gpio_handler_odd            /* GPIO odd handler */
+	      .long   gpio_handler_odd           /* GPIO odd handler */
 	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
-	      .long   dummy_handler
+
 
 	      .section .text
 
