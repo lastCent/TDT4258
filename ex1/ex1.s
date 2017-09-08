@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> refs/remotes/origin/master
         .syntax unified
 	
 	      .include "efm32gg.s"
@@ -114,6 +117,7 @@ cmu_base_addr:
 	LDR	R1,	=GPIO_DOUT
 	ADD	R2,	R1,	R0
 	MOV	R3,	0b11110000000
+<<<<<<< HEAD
 	STR	R3,	[R2]	
 	//Setup buttons
 	LDR	R3,	[=GIO_PC_MODEL, =GPIO_BASE]
@@ -125,6 +129,15 @@ cmu_base_addr:
 	STR	R2,	[R4]	//Setting pins to pull up mode
 				// find status in GPIO_PC_DIN
 	b .  // do nothing
+=======
+	STR	R3,	[R2]
+	//Set pins 
+	// Enable interrupt vector
+	LDR	R0,	=ISER0
+	MOV	R1, 	0x802
+	
+	b . 
+>>>>>>> refs/remotes/origin/master
 	
 	/////////////////////////////////////////////////////////////////////////////
 	//
@@ -135,7 +148,11 @@ cmu_base_addr:
 	
         .thumb_func
 gpio_handler:  
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> refs/remotes/origin/master
 	      b .  // do nothing
 	
 	/////////////////////////////////////////////////////////////////////////////
@@ -144,6 +161,7 @@ gpio_handler:
 dummy_handler:  
         b .  // do nothing
 
+<<<<<<< HEAD
 =======
         .syntax unified
 	
@@ -280,4 +298,6 @@ gpio_handler:
 dummy_handler:  
         b .  // do nothing
 
+>>>>>>> refs/remotes/origin/master
+=======
 >>>>>>> refs/remotes/origin/master
