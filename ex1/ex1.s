@@ -114,11 +114,16 @@ cmu_base_addr:
 	LDR	R1,	=GPIO_DOUT
 	ADD	R2,	R1,	R0
 	MOV	R3,	0b11110000000
-	STR	R3,	[R2]
-	
+	STR	R3,	[R2]	
 	//Setup buttons
+	LDR	R3,	[=GIO_PC_MODEL, =GPIO_BASE]
+	LDR	R4,	[=GPIO_PC_DOUT, =GPIO_BASE]	
+	MOV	R1, 	0x33333333
+	MOV	R2,	0xff
 	
-
+	STR	R1,	[R3]	//Setting Pins to input
+	STR	R2,	[R4]	//Setting pins to pull up mode
+				// find status in GPIO_PC_DIN
 	b .  // do nothing
 	
 	/////////////////////////////////////////////////////////////////////////////
