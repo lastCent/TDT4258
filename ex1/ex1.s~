@@ -115,9 +115,33 @@ cmu_base_addr:
   // The CPU will jump here when there is a GPIO interrupt
 	//
 	/////////////////////////////////////////////////////////////////////////////
-	
+
+		
+
         .thumb_func
-gpio_handler:  
+gpio_handler:
+	LDR	R1,	=GPIO_BASE
+	LDR	R2,	=GPIO_IF
+	ADD	R3,	R1,	R2				//Loading the value of GPIO_IF into R3
+	LDR	R2,	=GPIO_IFC				
+	ADD	R2,	R2,	R1				//Loads the address of GPIO_IFC into R2
+	STR	R3,	[R2]					//Clears the interrupt, writing GPIO_IF into GPIO_IFC
+	
+	//Loads the value of GPIO_PC_DIN, LSL 8 times
+	LDR	R2,	=GPIO_PC_BASE
+	LDR	R3,	=GPIO_DIN
+	ADD	R4,	R2,	R3
+	LSL	R4,	R4,	8
+
+	//EXORS the bit into GPIO_PA_DOUT
+	LDR	R1,	=GPIO_PA_BASE
+	LDR	R2,	=GPIO_DOUT
+	ADD	R3,	R1,	R2
+	EOR	R5,	R4,	R3
+	STR	R5,	[R3]
+	
+	
+		
 	      b .  // do nothing
 	
 	/////////////////////////////////////////////////////////////////////////////
