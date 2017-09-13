@@ -8,6 +8,13 @@
 
 
 	      //////////////////////////////////////////////////////////////////////
+
+	//Systick
+		SYSTICK_CTRL	= 0xE000E010
+		SYSTICK_VAL	= 0xE000E018
+		SYSTICK_LOAD	= 0xE000E014
+
+
       	// GPIO
 
 	      GPIO_PA_BASE = 0x40006000
