@@ -106,14 +106,6 @@ cmu_base_addr:
 	STR	R1,	[R3]	//Setting Pins to input
 	STR	R2,	[R4]	//Setting pins to pull up mode
 
-	//Enable GPIO interrupts
-        //Set GPIO_EXTIPSELL
-        LDR     R0,     =GPIO_BASE
-        LDR     R1,     =GPIO_EXTIPSELL
-        ADD     R2,     R1,     R0  
-        MOV     R3,     0x22222222
-        STR     R3,     [R2]
-
 
 loop: 
 	LDR	R0, =GPIO_PC_BASE
