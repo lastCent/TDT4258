@@ -5,6 +5,7 @@
 
 volatile int timeToPlay = 0;
 volatile int timeToPlay2 = 0;
+volatile int timeToPlay3 = 0;
 volatile int isOff = 0;
 int duration = 1500;
 uint32_t amp[16] = {4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3};
@@ -36,7 +37,7 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler()
 void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler()
 {
 
-
+	*TIMER1_IEN = 1;
 	//Clear interrupt flags
 	*GPIO_IFC |= *GPIO_IF;
 	uint32_t temp = ~*GPIO_PC_DIN;
@@ -44,36 +45,36 @@ void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler()
 
 	// Decide which button is pressed
 	if ((temp & 0b1) == 0b1){
-		*TIMER1_TOP = period[0];
-		timeToPlay = 1;
+		//*TIMER1_TOP = period[0];
+		timeToPlay3 = 1;
 	}
 	else if ((temp & 0b10) == 0b10){
-		*TIMER1_TOP = period[1];
+		timeToPlay3 = 1;
+		
 
 
 	}
 	else if ((temp & 0b100) == 0b100){
-		*TIMER1_TOP = period[2];
+		timeToPlay3 = 1;
 
 		}
 	else if ((temp & 0b1000)== 0b1000){
-		*TIMER1_TOP = period[3];
+		timeToPlay = 1;
 
 		}
 	else if ((temp & 0b10000)== 0b10000){
-		*TIMER1_TOP = period[4];
+		timeToPlay3 = 1;
 
 		}
 	else if ((temp & 0b100000)== 0b100000){
-		*TIMER1_TOP = period[5];
+		timeToPlay3 = 1;
 
 		}
 	else if ((temp & 0b1000000)== 0b1000000){
-		*TIMER1_TOP = period[6];
+		timeToPlay3 = 1;
 
 		}
 	else if ((temp & 0b10000000)== 0b10000000){
-		//*TIMER1_TOP = period[7];
 		timeToPlay2 = 1;
 		}
 	else{
@@ -83,6 +84,7 @@ void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler()
 		isOff = 0;
 		*TIMER1_IEN = 1;
 	}
+
 	counter=0; // reset the tone time
 
 

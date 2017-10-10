@@ -20,8 +20,10 @@ void setupTimer(); //uint32_t period
 void setupDAC();
 void setupNVIC();
 void setupGPIO();
+void setupSCR();
 void playMelody();
 void playMelody2();
+void playMelody3();
 void setPeriod(uint32_t period);
 
 /*
@@ -35,7 +37,7 @@ int main(void)
 	setupGPIO();
 	setupDAC();
 	setupTimer();
-
+	setupSCR();
 	/*
 	 * Enable interrupt handling 
 	 */
@@ -49,12 +51,16 @@ int main(void)
 	//extern timeToPlay=1;
 	//timeToPlay=1;
 	while (1){
+		__asm__("wfi");
 
-		if(timeToPlay==1){
+		if(timeToPlay == 1){
 			playMelody();
 		}
-		else if(timeToPlay2==1){
+		else if(timeToPlay2 == 1){
 			playMelody2();
+		}
+		else if (timeToPlay3 == 1){
+			playMelody3();
 		}
 	}
 	return 0;
@@ -161,6 +167,35 @@ void playMelody2(){
 
 	*GPIO_PA_DOUT=~0;
 	*GPIO_IEN=0xff;
+}
+
+void playMelody3(){
+
+	*GPIO_PA_DOUT=0;
+	timeToPlay3=0;
+	*GPIO_IEN = 0;
+	
+	int counter = 0;
+	int maxCounter = 100000;
+	setPeriod(period[0]);
+	while (counter<maxCounter) counter+=1;
+	counter=1000;
+	while (counter<maxCounter) counter+=1;
+	setPeriod(period[1]);
+	counter=5000;
+	while (counter<maxCounter) counter+=1;
+	setPeriod(period[7]);
+	counter=10000;
+	while (counter<maxCounter) counter+=1;
+	setPeriod(period[5]);
+	counter=0;
+	while (counter<maxCounter) counter+=1;
+	setPeriod(period[3]);
+	counter=0;
+	while (counter<maxCounter) counter+=1;
+	*GPIO_PA_DOUT=~0;
+	*GPIO_IEN=0xff;
+	
 }
 void setPeriod(uint32_t period){
 	*TIMER1_TOP = period;

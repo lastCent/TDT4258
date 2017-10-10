@@ -2,6 +2,8 @@
 
 extern volatile int timeToPlay;
 extern volatile int timeToPlay2;
+extern volatile int timeToPlay3;
+
 extern uint32_t period[8];
 // GPIO
 #define GPIO_BASE 0x40006000

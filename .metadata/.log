@@ -25,3 +25,9 @@ Command-line arguments:  -os win32 -ws win32 -arch x86
 
 !ENTRY com.silabs.ide.platform.ui 1 0 2017-10-10 12:42:20.077
 !MESSAGE Input was not a file editor, maybe we need more support? org.eclipse.ui.ide.FileStoreEditorInput@f9c7387f
+
+!ENTRY com.silabs.ide.platform.ui 1 0 2017-10-10 13:21:21.686
+!MESSAGE Input was not a file editor, maybe we need more support? org.eclipse.ui.ide.FileStoreEditorInput@cef6d5fc
+
+!ENTRY com.silabs.ide.platform.ui 1 0 2017-10-10 13:27:29.600
+!MESSAGE Input was not a file editor, maybe we need more support? org.eclipse.ui.ide.FileStoreEditorInput@34c0c845
