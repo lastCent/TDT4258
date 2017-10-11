@@ -3,3 +3,7 @@
 
 # Pycharm Files
 .metadata/
+
+# GOutPutStream
+
+.goutputstream-*
