@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #include "efm32gg.h"
@@ -21,6 +22,7 @@ void setupTimer(uint32_t period);
 void setupDAC();
 void setupNVIC();
 void setupGPIO();
+void melody();
 void melody1();
 void melody2();
 void melody3();
@@ -56,28 +58,40 @@ int main(void)
 		uint32_t temp = ~*GPIO_PC_DIN;
 		// Decide which button is pressed
 		if ((temp & 0b1) == 0b1){
-			melody2();
+			melody(1);
 		}else if ((temp & 0b10) == 0b10){
-			melody2();
+			melody(1);
 		}else if ((temp & 0b100) == 0b100){
-			melody2();
+			melody(1);
 		}else if ((temp & 0b1000)== 0b1000){
-			melody1();
+			melody(0);
 		}else if ((temp & 0b10000)== 0b10000){
-			melody2();
+			melody(1);
 		}else if ((temp & 0b100000)== 0b100000){
-			melody2();
+			melody(1);
 		}else if ((temp & 0b1000000)== 0b1000000){
-			melody2();
+			melody(1);
 		}else if ((temp & 0b10000000)== 0b10000000){
-			melody3();
+			melody(2);
 		}
 	}
 	return 0;
 }
-void melody1(){
-	int p[6] = {4, 3, 2, 1, 0};
-	for(int i = 0; i < 6; i++){
+
+void melody(int x){
+	int *p;
+	int p1[5] = {4, 3, 2, 1, 0};
+	int p2[6] = {1, 4, 1, 4, 1, 4};
+	int p3[5] = {0, 1, 2, 3, 4};
+	if(x == 0){
+		p = p1;
+	}else if(x == 1){
+		p = p2;
+	}else{
+		p = p3;
+	}
+
+	for(int i = 0; i < sizeof(p) + 1; i++){
 		while(1){
 			if(*TIMER1_CNT > period[p[i]]){
 				*TIMER1_CNT = 0;
@@ -95,45 +109,6 @@ void melody1(){
 	}
 }
 
-void melody2(){
-	int p[6] = {1, 4, 1, 4, 1, 4};
-	for(int i = 0; i < 6; i++){
-		while(1){
-			if(*TIMER1_CNT > period[p[i]]){
-				*TIMER1_CNT = 0;
-				*DAC0_CH0DATA = amp[ampIndex];
-				*DAC0_CH1DATA = amp[ampIndex];
-				ampIndex+=1;
-				if (ampIndex == 16){ ampIndex=0;}
-				counter+=1;
-				if (counter>duration){
-					counter = 0;
-					break;					
-				}
-			}
-		}
-	}
-}
-
-void melody3(){
-	int p[5] = {0, 1, 2, 3, 4};
-	for(int i = 0; i < 5; i++){
-		while(1){
-			if(*TIMER1_CNT > period[p[i]]){
-				*TIMER1_CNT = 0;
-				*DAC0_CH0DATA = amp[ampIndex];
-				*DAC0_CH1DATA = amp[ampIndex];
-				ampIndex+=1;
-				if (ampIndex == 16){ ampIndex=0;}
-				counter+=1;
-				if (counter>duration){
-					counter = 0;
-					break;					
-				}
-			}
-		}
-	}
-}
 
 void setupNVIC()
 {
