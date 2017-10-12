@@ -31,6 +31,9 @@ uint32_t amp[16] = {4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3};
 uint32_t counter =0;
 uint32_t ampIndex = 0;
 uint32_t period[5] = {50, 200, 500, 800, 1000};
+int p1[5] = {4, 3, 2, 1, 0};
+int p2[6] = {1, 4, 1, 4, 1, 4};
+int p3[5] = {0, 1, 2, 3, 4};
 
 /*
  * Your code will start executing here 
@@ -80,9 +83,6 @@ int main(void)
 
 void melody(int x){
 	int *p;
-	int p1[5] = {4, 3, 2, 1, 0};
-	int p2[6] = {1, 4, 1, 4, 1, 4};
-	int p3[5] = {0, 1, 2, 3, 4};
 	if(x == 0){
 		p = p1;
 	}else if(x == 1){
@@ -92,22 +92,20 @@ void melody(int x){
 	}
 
 	for(int i = 0; i < sizeof(p) + 1; i++){
-		while(1){
+		while(counter<duration){
 			if(*TIMER1_CNT > period[p[i]]){
 				*TIMER1_CNT = 0;
 				*DAC0_CH0DATA = amp[ampIndex];
 				*DAC0_CH1DATA = amp[ampIndex];
-				ampIndex+=1;
+				ampIndex++;
 				if (ampIndex == 16){ ampIndex=0;}
-				counter+=1;
-				if (counter>duration){
-					counter = 0;
-					break;					
-				}
+				counter++;			
 			}
 		}
+		counter = 0;
 	}
 }
+
 
 
 void setupNVIC()
