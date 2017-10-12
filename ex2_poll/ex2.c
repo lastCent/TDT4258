@@ -26,6 +26,8 @@ void melody();
 void melody1();
 void melody2();
 void melody3();
+void playWave();
+void playSound();
 int duration = 1500;
 uint32_t amp[16] = {4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3};
 uint32_t counter =0;
@@ -35,6 +37,12 @@ int p1[5] = {4, 3, 2, 1, 0};
 int p2[6] = {1, 4, 1, 4, 1, 4};
 int p3[5] = {0, 1, 2, 3, 4};
 
+// Set first number to be length of array, wave starts after 0th int
+int sound1[17] = {17,4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3}; // Cosine
+int saw[17] = {17,1,1,2,2,3,3,4,4,5,5,6,6,7,5,3,1}; // Sawtooth 
+int sawInv[17] = {17,1,3,5,7,7,6,6,5,5,4,4,3,3,2,2,1}; // Sawtooth inverted
+int square[17] = {17,1,1,1,1,4,4,4,4,1,1,1,1,4,4,4,4}; // Square
+int sqrWigl[17] = {17,1,2,1,2,4,5,4,5,1,2,1,2,4,5,4,5}; // Wiggly square
 /*
  * Your code will start executing here 
  */
@@ -57,6 +65,39 @@ int main(void)
 	 * interrupts instead of infinite loop for busy-waiting 
 	 */
 	while (1){
+		// Create pointers to waves
+		int *s;
+		s = sawInv;
+		int *t;
+		t = saw;
+		int *u;
+		u = square;
+		int *v;
+		v = sqrWigl;
+		//Create pointers to input arrays
+		int* demoTune[10] = {s,t,s,t,s,t,u,u,u,v};
+		int demoIntervals[11] = {11,1000,1000,500,500,300,300,1000,500,300,800};
+		int demoDurations[10] = {90000,90000,90000,90000,90000,90000,90000,90000,90000,90000};
+		int** demoT;
+		demoT = demoTune;
+		int* demoI;
+		demoI = demoIntervals;
+		int* demoD;
+		demoD = demoDurations;
+		// Play a tune
+		playSound(**demoT, *demoI, *demoD);
+		//playWave(*s, 1000, 900000);
+		//playWave(*t, 1000, 900000);
+		//playWave(*s, 500, 900000);
+		//playWave(*t, 500, 900000);
+		//playWave(*s, 300, 900000);
+		//playWave(*t, 300, 900000); 
+		//playWave(*u, 1000, 900000);
+		//playWave(*u, 500, 900000);
+		//playWave(*u, 300, 900000);
+		//playWave(*v, 800, 900000);
+		// Debug end
+		/*
 		*GPIO_PA_DOUT = (*GPIO_PC_DIN << 8);
 		uint32_t temp = ~*GPIO_PC_DIN;
 		// Decide which button is pressed
@@ -77,6 +118,7 @@ int main(void)
 		}else if ((temp & 0b10000000)== 0b10000000){
 			melody(2);
 		}
+		*/
 	}
 	return 0;
 }
@@ -106,7 +148,24 @@ void melody(int x){
 	}
 }
 
+void playWave(int* wavePtr, int interval, int duration) {
+	int playsLeft = duration / (interval * (sizeof(sound1)/sizeof(int)));
+	while(playsLeft > 0) {
+		for(int i = 1; i < *wavePtr/sizeof(int); i++){
+			*TIMER1_CNT = 0;
+			*DAC0_CH0DATA = *(wavePtr + i);
+			*DAC0_CH1DATA = *(wavePtr + i);
+			while(*TIMER1_CNT < interval);
+		}
+		playsLeft --;
+	}
+}
 
+void playSound(int** waveArr, int* intervalArr, int* durationArr) {
+	for (int i = 1; i < **waveArr/sizeof(int); i++) {
+		playWave(waveArr[i - 1], *(intervalArr + i), *(durationArr -1 + i));
+	} 
+}
 
 void setupNVIC()
 {
