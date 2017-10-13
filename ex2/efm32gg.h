@@ -1,9 +1,44 @@
 #include <stdint.h>
-
+/*
 extern volatile int timeToPlay;
 extern volatile int timeToPlay2;
 extern volatile int timeToPlay3;
+// Define premade waves
+// Set first number to be length of array, wave starts after 0th int
+extern int interCounter;
+extern int volume;
+extern int cosine[16];    // Cosine
+extern int saw[16];    // Sawtooth 
+extern int sawInv[16]; // Sawtooth inverted
+extern int square[16];// SquaRE
+extern int sqrWigl[16];// Wiggly square
+extern int low[16];        // none
+// Define different sounds
+// premade sound 1
+extern int *soundTune_1[7];
+extern int soundIntervals_1[7];
+extern int soundDurations_1[7];
+// premade sound 2
+extern int *soundTune_2[7];
+extern int soundIntervals_2[7];
+extern int soundDurations_2[7];
 
+// premade sound 3
+extern int *soundTune_3[7];
+extern int soundIntervals_3[7];
+extern int soundDurations_3[7];
+
+// premade sound 4
+extern int *soundTune_4[7];
+extern int soundIntervals_4[7];
+extern int soundDurations_4[7];
+
+// Global sound pointers
+extern int* waveP;
+extern int* InterP;
+extern int* DurP;
+extern int size;
+*/
 extern uint32_t period[8];
 // GPIO
 #define GPIO_BASE 0x40006000

@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stdbool.h>
-
 #include "efm32gg.h"
 
 volatile int timeToPlay = 0;
@@ -11,24 +10,48 @@ int duration = 1500;
 uint32_t amp[16] = {4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3};
 uint32_t counter =0;
 uint32_t period[8] = {0b1111111111,0b1111110010,0b1111100000,0b1110000000, 0b1000000000, 0b1000011011, 0b1000111111, 0b1011111111  };
+/*
+// Global sound pointers
+int* waveP;
+int* InterP;
+int* DurP;
+int size;
 
-uint32_t ampIndex = 0;
+// Define premade waves
+// Set first number to be length of array, wave starts after 0th int
+int interCounter;
+int volume;
+int cosine[16];    // Cosine
+int saw[16];    // Sawtooth 
+int sawInv[16]; // Sawtooth inverted
+int square[16];// SquaRE
+int sqrWigl[16];// Wiggly square
+int low[16];        // none
+// Define different sounds
+// premade sound 1
+int *soundTune_1[7];
+int soundIntervals_1[7];
+int soundDurations_1[7];
+// premade sound 2
+int *soundTune_2[7];
+int soundIntervals_2[7];
+int soundDurations_2[7];
+
+// premade sound 3
+int *soundTune_3[7];
+int soundIntervals_3[7];
+int soundDurations_3[7];
+
+// premade sound 4
+int *soundTune_4[7];
+int soundIntervals_4[7];
+int soundDurations_4[7];
+*/
 
 void __attribute__ ((interrupt)) TIMER1_IRQHandler()
 {
-
 	*TIMER1_IFC |= 0x1;
-	*DAC0_CH0DATA = amp[ampIndex];	//Put data in the DAC_DATA registers, does this set the amplitude?
-	*DAC0_CH1DATA = amp[ampIndex];
-	ampIndex+=1;
-	if (ampIndex == 16) ampIndex=0;
-	counter+=1;
-	if (counter>duration){
-		counter=0;
-		*TIMER1_IEN = 0;
-		isOff=1;
-	}
-
+	*TIMER1_IEN = 0;	
 }
 
 /*
@@ -37,7 +60,7 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler()
 void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler()
 {
 
-	*TIMER1_IEN = 1;
+	//*TIMER1_IEN = 1;
 	//Clear interrupt flags
 	*GPIO_IFC |= *GPIO_IF;
 	uint32_t temp = ~*GPIO_PC_DIN;
@@ -80,13 +103,14 @@ void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler()
 	else{
 		*GPIO_PA_DOUT=~0; // If something falls out of the desired clauses, light up all LEDs
 	}
+	/*
 	if(isOff == 1){ // check if timer is enabled or not
 		isOff = 0;
 		*TIMER1_IEN = 1;
 	}
 
 	counter=0; // reset the tone time
-
+	*/
 
 
 
