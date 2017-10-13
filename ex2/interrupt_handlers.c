@@ -12,10 +12,10 @@ void __attribute__ ((interrupt)) TIMER1_IRQHandler()
 {
 
 	*TIMER1_IFC |= 0x1;
-	*TIMER1_IEN = 0;
-	if (counter%2 == 0){
+	*TIMER1_IEN = 1;
+	if (counter%10 == 0){
 	*GPIO_PA_DOUT = (0b11111111 << 8);
-	}else{
+	}else if (counter%13 == 1){
 	*GPIO_PA_DOUT = (0b00000000 << 8);
 	}
 	counter++;
@@ -31,7 +31,7 @@ void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler()
 	//Clear interrupt flags
 	*GPIO_IFC |= *GPIO_IF;
 	uint32_t temp = ~*GPIO_PC_DIN;
-	*GPIO_PA_DOUT = (*GPIO_PC_DIN << 8);
+	//*GPIO_PA_DOUT = (*GPIO_PC_DIN << 8);
 
 	// Decide which button is pressed
 	if ((temp & 0b1) == 0b1){

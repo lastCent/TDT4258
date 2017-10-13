@@ -28,7 +28,7 @@ volatile int timeToPlay;
 volatile int timeToPlay2;
 volatile int timeToPlay3;
 
-
+/*
 // Define premade waves
 // Set first number to be length of array, wave starts after 0th int
 static int volume = 1;
@@ -58,7 +58,7 @@ static int soundDurations_3[7] = { 1000000, 2000000, 3000000, 1000000, 2000000, 
 static int *soundTune_4[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
 static int soundIntervals_4[7] = { 100, 100, 100, 100, 100, 100, 100 };
 static int soundDurations_4[7] = { 300, 300, 300, 300, 300, 300, 300 };
-
+*/
 /*
  * Your code will start executing here 
  */
@@ -84,27 +84,25 @@ int main(void)
 	//extern timeToPlay=1;
 	//timeToPlay=1;
 	while (1){
+		setPeriod(1000);
 
 		if(timeToPlay == 1){
 			//playSound(soundTune_1, 7, 16, soundIntervals_1, soundDurations_1);
-			setPeriod(500);
 		}
 		else if(timeToPlay2 == 1){
-			//playSound(soundTune_2, 7, 16, soundIntervals_2, soundDurations_2);
-			setPeriod(500);
+			//playSound(soundTune_2, 7, 16, soundIntervals_2, soundDurations_2)
 		}
 		else if (timeToPlay3 == 1){
 			//playSound(soundTune_3, 7, 16, soundIntervals_3, soundDurations_3);
-			setPeriod(500);
 		}
 		timeToPlay = 0;
 		timeToPlay2 = 0;
 		timeToPlay3 = 0;
-		__asm__("wfi");
+		//__asm__("wfi");
 	}
 	return 0;
 }
-
+/*
 void playSound(int **waveArr, int sizeWarr, int sizeWave, int *intervalArr, int *durationArr){
 	// Loops through sound arrays and calls the method playWave()
 	for (int i = 0; i < sizeWarr; i++) {
@@ -122,14 +120,12 @@ void playWave(int *wavePtr, int size, int interval, int duration){
 			// Feed DAC to play sound, wavePTR is a predefined amplitude array, Volume is used as a multiplier
 			*DAC0_CH0DATA = wavePtr[i] * volume;
 			*DAC0_CH1DATA = wavePtr[i] * volume;
-			//INTERVAL_!!
-			setPeriod(interval);
-			//__asm__("wfi");
+			//WAIT FUNCTION ie TIMER1_CNT
 		}
 		playsLeft--;
 	}
 }
-
+*/
 void setupNVIC()
 {
 	/*
