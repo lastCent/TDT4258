@@ -19,7 +19,7 @@ void setupGPIO()
 	*CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_GPIO;	/* enable GPIO clock */
 	*GPIO_PA_CTRL = 2;	/* set high drive strength */
 	*GPIO_PA_MODEH = 0x55555555;	/* set pins A8-15 as output */
-	*GPIO_PA_DOUT = 0b1111111000000000;	/* turn off LEDs D4-D8 (LEDs are active
+	*GPIO_PA_DOUT = 0b1111111100000000;	/* Turn off LEDs D4-D8 (LEDs are active
 				 * low) */
 
 

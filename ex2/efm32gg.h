@@ -1,8 +1,9 @@
 #include <stdint.h>
-/*
+
 extern volatile int timeToPlay;
 extern volatile int timeToPlay2;
 extern volatile int timeToPlay3;
+/*
 // Define premade waves
 // Set first number to be length of array, wave starts after 0th int
 extern int interCounter;

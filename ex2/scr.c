@@ -8,6 +8,7 @@
  */
 void setupSCR()//uint32_t period
 {
-	*SCR |= 0b100;
+	//*SCR |= 0b100;
+	*SCR = 0;
 	
 }
