@@ -121,89 +121,24 @@ int main(void)
 	return 0;
 }
 
-void melody(int x)
-{
-	int *p;
-	if (x == 0) {
-		p = p1;
-	} else if (x == 1) {
-		p = p2;
-	} else {
-		p = p3;
-	}
-
-	for (int i = 0; i < sizeof(p) + 1; i++) {
-		while (counter < duration) {
-			if (*TIMER1_CNT > period[p[i]]) {
-				*TIMER1_CNT = 0;
-				*DAC0_CH0DATA = amp[ampIndex];
-				*DAC0_CH1DATA = amp[ampIndex];
-				ampIndex++;
-				if (ampIndex == 16) {
-					ampIndex = 0;
-				}
-				counter++;
-			}
-		}
-		counter = 0;
-	}
-}
-
-void playWave(int *wavePtr, int size, int interval, int duration)
-{
+void playWave(int *wavePtr, int size, int interval, int duration){
 	int playsLeft = duration / (interval * size);
 	while (playsLeft > 0) {
 		for (int i = 0; i < size; i++) {
 			*TIMER1_CNT = 0;
 			*DAC0_CH0DATA = wavePtr[i] * volume;
 			*DAC0_CH1DATA = wavePtr[i] * volume;
-			while (*TIMER1_CNT < interval) ;
-			//*TIMER1_CNT = 0;
-			//while(*TIMER1_CNT < interval);
+			WHILE (*TIMER1_CNT < interval) ;
 		}
 		playsLeft--;
 	}
 }
 
-void playSound(int **waveArr, int sizeWarr, int sizeWave, int *intervalArr,
-	       int *durationArr)
-{
-	for (int i = 0; i < sizeWarr; i++) {
-		playWave(waveArr[i], sizeWave, *(intervalArr + i),
-			 *(durationArr + i));
+void playSound(int **waveArr, int sizeWarr, int sizeWave, int *intervalArr, int *durationArr){
+	for (int i = 0; i < sizeWarr; i++) {playWave(waveArr[i], sizeWave, *(intervalArr + i),
+			*(durationArr + i));
 	}
 }
 
-//waveArr[i-1] direkte til int[]
-
-void setupNVIC()
-{
-	/*
-	 * TODO use the NVIC ISERx registers to enable handling of
-	 * interrupt(s) remember two things are necessary for interrupt
-	 * handling: - the peripheral must generate an interrupt signal - the
-	 * NVIC must be configurED TO MAKE THE cpu HANDLE The signal You will
-	 * need TIMER1, GPIO odd and GPIO even interrupt handling for this
-	 * assignment. 
-	 */
-
+void setupNVIC() {
 }
-
-/*
- * if other interrupt handlers are needed, use the following names:
- * NMI_Handler HardFault_Handler MemManage_Handler BusFault_Handler
- * UsageFault_Handler Reserved7_Handler Reserved8_Handler
- * Reserved9_Handler Reserved10_Handler SVC_Handler DebugMon_Handler
- * Reserved13_Handler PendSV_Handler SysTick_Handler DMA_IRQHandler
- * GPIO_EVEN_IRQHandler TIMER0_IRQHandler USART0_RX_IRQHandler
- * USART0_TX_IRQHandler USB_IRQHandler ACMP0_IRQHandler ADC0_IRQHandler
- * DAC0_IRQHandler I2C0_IRQHandler I2C1_IRQHandler GPIO_ODD_IRQHandler
- * TIMER1_IRQHandler TIMER2_IRQHandler TIMER3_IRQHandler
- * USART1_RX_IRQHandler USART1_TX_IRQHandler LESENSE_IRQHandler
- * USART2_RX_IRQHandler USART2_TX_IRQHandler UART0_RX_IRQHandler
- * UART0_TX_IRQHandler UART1_RX_IRQHandler UART1_TX_IRQHandler
- * LEUART0_IRQHandler LEUART1_IRQHandler LETIMER0_IRQHandler
- * PCNT0_IRQHandler PCNT1_IRQHandler PCNT2_IRQHandler RTC_IRQHandler
- * BURTC_IRQHandler CMU_IRQHandler VCMP_IRQHandler LCD_IRQHandler
- * MSC_IRQHandler AES_IRQHandler EBI_IRQHandler EMU_IRQHandler 
- */
