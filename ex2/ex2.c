@@ -21,10 +21,43 @@ void setupDAC();
 void setupNVIC();
 void setupGPIO();
 void setupSCR();
-void playMelody();
-void playMelody2();
-void playMelody3();
 void setPeriod(uint32_t period);
+void playWave();
+void playSound();
+volatile int timeToPlay;
+volatile int timeToPlay2;
+volatile int timeToPlay3;
+
+
+// Define premade waves
+// Set first number to be length of array, wave starts after 0th int
+static int volume = 1;
+static int cosine[16] = { 4, 5, 6, 7, 7, 7, 6, 5, 4, 3, 2, 1, 1, 1, 2, 3 };	// Cosine
+static int saw[16] = { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 5, 3, 1 };	// Sawtooth 
+static int sawInv[16] = { 1, 3, 5, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1 };	// Sawtooth inverted
+static int square[16] = { 1, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 1, 4, 4, 4, 4 };	// SquaRE
+static int sqrWigl[16] = { 1, 2, 1, 2, 4, 5, 4, 5, 1, 2, 1, 2, 4, 5, 4, 5 };// Wiggly square
+static int low[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };	// none
+// Define different sounds
+// premade sound 1
+static int *soundTune_1[7] = { sawInv, square, square, square, square, square, saw };
+static int soundIntervals_1[7] = { 800, 800, 850, 800, 700, 900, 2000 };
+static int soundDurations_1[7] = { 6000000, 3000000, 6000000, 6000000, 6000000, 6000000, 6000000 };
+
+// premade sound 2
+static int *soundTune_2[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
+static int soundIntervals_2[7] = { 500, 1000, 500, 1000, 500, 1000, 500 };
+static int soundDurations_2[7] = { 1000000, 2000000, 1000000, 2000000, 1000000, 2000000, 1000000 };
+
+// premade sound 3
+static int *soundTune_3[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
+static int soundIntervals_3[7] = { 300, 400, 500, 600, 700, 800, 900 };
+static int soundDurations_3[7] = { 1000000, 2000000, 3000000, 1000000, 2000000, 3000000, 1000000 };
+
+// premade sound 4
+static int *soundTune_4[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
+static int soundIntervals_4[7] = { 100, 100, 100, 100, 100, 100, 100 };
+static int soundDurations_4[7] = { 300, 300, 300, 300, 300, 300, 300 };
 
 /*
  * Your code will start executing here 
@@ -51,19 +84,50 @@ int main(void)
 	//extern timeToPlay=1;
 	//timeToPlay=1;
 	while (1){
-		__asm__("wfi");
 
 		if(timeToPlay == 1){
-			playMelody();
+			//playSound(soundTune_1, 7, 16, soundIntervals_1, soundDurations_1);
+			setPeriod(500);
 		}
 		else if(timeToPlay2 == 1){
-			playMelody2();
+			//playSound(soundTune_2, 7, 16, soundIntervals_2, soundDurations_2);
+			setPeriod(500);
 		}
 		else if (timeToPlay3 == 1){
-			playMelody3();
+			//playSound(soundTune_3, 7, 16, soundIntervals_3, soundDurations_3);
+			setPeriod(500);
 		}
+		timeToPlay = 0;
+		timeToPlay2 = 0;
+		timeToPlay3 = 0;
+		__asm__("wfi");
 	}
 	return 0;
+}
+
+void playSound(int **waveArr, int sizeWarr, int sizeWave, int *intervalArr, int *durationArr){
+	// Loops through sound arrays and calls the method playWave()
+	for (int i = 0; i < sizeWarr; i++) {
+		playWave(waveArre[i], sizeWave, *(intervalArr + i), *(durationArr + i));
+	}
+}
+
+void playWave(int *wavePtr, int size, int interval, int duration){
+	// Play a single wave for a given duration
+	int playsLeft = duration / (interval * size);
+	// playsLeft: number of times the wave is played to fill the duration
+	while (playsLeft > 0) {
+		for (int i = 0; i < size; i++) {
+			*TIMER1_CNT = 0;	// resest timer
+			// Feed DAC to play sound, wavePTR is a predefined amplitude array, Volume is used as a multiplier
+			*DAC0_CH0DATA = wavePtr[i] * volume;
+			*DAC0_CH1DATA = wavePtr[i] * volume;
+			//INTERVAL_!!
+			setPeriod(interval);
+			//__asm__("wfi");
+		}
+		playsLeft--;
+	}
 }
 
 void setupNVIC()
@@ -81,122 +145,6 @@ void setupNVIC()
 	*ISER0 |= 1<<12;
 }
 
-/*
- * if other interrupt handlers are needed, use the following names:
- * NMI_Handler HardFault_Handler MemManage_Handler BusFault_Handler
- * UsageFault_Handler Reserved7_Handler Reserved8_Handler
- * Reserved9_Handler Reserved10_Handler SVC_Handler DebugMon_Handler
- * Reserved13_Handler PendSV_Handler SysTick_Handler DMA_IRQHandler
- * GPIO_EVEN_IRQHandler TIMER0_IRQHandler USART0_RX_IRQHandler
- * USART0_TX_IRQHandler USB_IRQHandler ACMP0_IRQHandler ADC0_IRQHandler
- * DAC0_IRQHandler I2C0_IRQHandler I2C1_IRQHandler GPIO_ODD_IRQHandler
- * TIMER1_IRQHandler TIMER2_IRQHandler TIMER3_IRQHandler
- * USART1_RX_IRQHandler USART1_TX_IRQHandler LESENSE_IRQHandler
- * USART2_RX_IRQHandler USART2_TX_IRQHandler UART0_RX_IRQHandler
- * UART0_TX_IRQHandler UART1_RX_IRQHandler UART1_TX_IRQHandler
- * LEUART0_IRQHandler LEUART1_IRQHandler LETIMER0_IRQHandler
- * PCNT0_IRQHandler PCNT1_IRQHandler PCNT2_IRQHandler RTC_IRQHandler
- * BURTC_IRQHandler CMU_IRQHandler VCMP_IRQHandler LCD_IRQHandler
- * MSC_IRQHandler AES_IRQHandler EBI_IRQHandler EMU_IRQHandler 
- */
-void playMelody(){
-
-	*GPIO_PA_DOUT=0;
-	timeToPlay=0;
-	*GPIO_IEN = 0;
-
-	int counter = 0;
-	int maxCounter = 290000;
-	setPeriod(period[4]);
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[1]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[4]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[1]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[4]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[1]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[4]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[1]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-
-	*GPIO_PA_DOUT=~0;
-	*GPIO_IEN=0xff;
-}
-void playMelody2(){
-	*GPIO_PA_DOUT=0;
-	timeToPlay2=0;
-	*GPIO_IEN = 0;
-
-	int counter = 0;
-	int maxCounter = 100000;
-	setPeriod(period[0]);
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[7]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[0]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[7]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[0]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[7]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[0]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[7]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-
-	*GPIO_PA_DOUT=~0;
-	*GPIO_IEN=0xff;
-}
-
-void playMelody3(){
-
-	*GPIO_PA_DOUT=0;
-	timeToPlay3=0;
-	*GPIO_IEN = 0;
-	
-	int counter = 0;
-	int maxCounter = 100000;
-	setPeriod(period[0]);
-	while (counter<maxCounter) counter+=1;
-	counter=1000;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[1]);
-	counter=5000;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[7]);
-	counter=10000;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[5]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	setPeriod(period[3]);
-	counter=0;
-	while (counter<maxCounter) counter+=1;
-	*GPIO_PA_DOUT=~0;
-	*GPIO_IEN=0xff;
-	
-}
 void setPeriod(uint32_t period){
 	*TIMER1_TOP = period;
 	*TIMER1_IEN = 1;
