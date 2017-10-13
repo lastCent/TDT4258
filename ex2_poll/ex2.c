@@ -38,9 +38,9 @@ static int soundIntervals_3[7] = { 300, 400, 500, 600, 700, 800, 900 };
 static int soundDurations_3[7] = { 1000000, 2000000, 3000000, 1000000, 2000000, 3000000, 1000000 };
 
 // premade sound 4
-static int *soundTune_3[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
-static int soundIntervals_3[7] = { 100, 100, 100, 100, 100, 100, 100 };
-static int soundDurations_3[7] = { 300, 300, 300, 300, 300, 300, 300 };
+static int *soundTune_4[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
+static int soundIntervals_4[7] = { 100, 100, 100, 100, 100, 100, 100 };
+static int soundDurations_4[7] = { 300, 300, 300, 300, 300, 300, 300 };
 
 
 int main(void)

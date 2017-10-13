@@ -10,7 +10,7 @@ void setupTimer()//uint32_t period
 {
 	*CMU_HFPERCLKEN0 |= CMU2_HFPERCLKEN0_TIMER1;
 	*TIMER1_TOP = 0b1111111111; //Does this set period?
-	*TIMER1_IEN = 0x1;
+	*TIMER1_IEN = 0x0;
 	*TIMER1_CMD = 0x1;
 	/*
 	 * TODO enable and set up the timer
