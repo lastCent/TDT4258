@@ -22,10 +22,12 @@ void setupGPIO();
 void setupSCR();
 void playWave();
 void playSound();
-int volatile timeToPlay = 0;
-int volatile timeToPlay2 = 0;
-int volatile timeToPlay3 = 0;
+void play(int);
+int timeToPlay = 0;
+int timeToPlay2 = 0;
+int timeToPlay3 = 0;
 void setPeriod();
+bool next = true;
 /*
 // Global sound pointers
 int* waveP;
@@ -88,18 +90,19 @@ int main(void)
 	//timeToPlay=1;
 	while (1){
 		if(timeToPlay){
-			playSound(soundTune_1, 7, 16, soundIntervals_1, soundDurations_1);
+			play(1);
+			timeToPlay = 0;
 		}
 		else if(timeToPlay2){
-			playSound(soundTune_2, 7, 16, soundIntervals_2, soundDurations_2);
+			play(2);
+			timeToPlay2 = 0;
 		}
 		else if (timeToPlay3){
-			playSound(soundTune_3, 7, 16, soundIntervals_3, soundDurations_3);
+			play(3);
+			timeToPlay3 = 0;
 		}
-		timeToPlay = 0;
-		timeToPlay2 = 0;
-		timeToPlay3 = 0;
-		//__asm__("wfi");
+		*GPIO_PA_DOUT = (0b11111111 << 8);
+		__asm__("wfi");
 	}
 	return 0;
 }
@@ -118,21 +121,30 @@ void playWave(int *wavePtr, int size, int interval, int duration){
         while (timeLeft > 0) {
                 for (int i = 0; i < size; i++) {
                         // Feed DAC to play sound, wavePtr is a predefined amplitude array, Volume is used as a multiplier
-                        *DAC0_CH0DATA = wavePtr[i] * volume;
-                        *DAC0_CH1DATA = wavePtr[i] * volume;
-			setPeriod(interval);
-			__asm__("WFI");
+                    *DAC0_CH0DATA = wavePtr[i] * volume;
+                    *DAC0_CH1DATA = wavePtr[i] * volume;
+					setPeriod(interval);
+					while(next){}
+					next = true;
                         
                 }
-                timeLeft -= interval * size;
+                timeLeft -= interval * size;   
         }
 }
 
-
+void play(int x){
+	if(x == 1){
+		playSound(soundTune_1, 7, 16, soundIntervals_1, soundDurations_1);
+	}else if(x == 2){
+		playSound(soundTune_2, 7, 16, soundIntervals_2, soundDurations_2);
+	}else if (x == 3){
+		playSound(soundTune_3, 7, 16, soundIntervals_3, soundDurations_3);
+	}
+}
 
 void setupNVIC()
 {
-	*ISER0 |= 1<<1; //0x802 old value; // Enable interrupt handling, gpio = 1 and 11, timer1  = 12, 0b110000000001
+	*ISER0 = 1<<1; //0x802 old value; // Enable interrupt handling, gpio = 1 and 11, timer1  = 12, 0b110000000001
 	*ISER0 |= 1<<11;
 	*ISER0 |= 1<<12;
 }
@@ -141,3 +153,4 @@ void setPeriod(uint32_t period){
 	*TIMER1_TOP = period;
 	*TIMER1_IEN = 1;
 }
+
