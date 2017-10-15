@@ -1,8 +1,6 @@
 #include <stdint.h>
 
-extern volatile int timeToPlay;
-extern volatile int timeToPlay2;
-extern volatile int timeToPlay3;
+
 extern uint32_t period[5];
 
 // GPIO

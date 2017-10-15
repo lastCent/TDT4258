@@ -20,7 +20,7 @@ static int saw[16] = { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 5, 3, 1 };	// Sawt
 static int sawInv[16] = { 1, 3, 5, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1 };	// Sawtooth inverted
 static int square[16] = { 1, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 1, 4, 4, 4, 4 };	// SquaRE
 static int sqrWigl[16] = { 1, 2, 1, 2, 4, 5, 4, 5, 1, 2, 1, 2, 4, 5, 4, 5 };// Wiggly square
-static int low[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };	// none
+//static int low[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };	// none
 // Define different sounds
 // premade sound 1
 static int *soundTune_1[7] = { sawInv, square, square, square, square, square, saw };
@@ -38,9 +38,9 @@ static int soundIntervals_3[7] = { 300, 400, 500, 600, 700, 800, 900 };
 static int soundDurations_3[7] = { 1000000, 2000000, 3000000, 1000000, 2000000, 3000000, 1000000 };
 
 // premade sound 4
-static int *soundTune_4[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
-static int soundIntervals_4[7] = { 100, 100, 100, 100, 100, 100, 100 };
-static int soundDurations_4[7] = { 300, 300, 300, 300, 300, 300, 300 };
+//static int *soundTune_4[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
+//static int soundIntervals_4[7] = { 100, 100, 100, 100, 100, 100, 100 };
+//static int soundDurations_4[7] = { 300, 300, 300, 300, 300, 300, 300 };
 
 
 int main(void)

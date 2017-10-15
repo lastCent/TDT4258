@@ -1,11 +1,9 @@
 #include <stdint.h>
 
-int timeToPlay;
-int timeToPlay2;
-int timeToPlay3;
+
+int melody;
 bool next;
 
-extern uint32_t period[8];
 // GPIO
 #define GPIO_BASE 0x40006000
 #define GPIO_PA_BASE 0x40006000
