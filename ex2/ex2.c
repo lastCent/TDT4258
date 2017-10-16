@@ -31,7 +31,7 @@ int low[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };       // none
 // premade sound 1
 int *soundTune_1[7] = { sawInv, square, square, square, square, square, saw };
 int soundIntervals_1[7] = { 800, 800, 850, 800, 700, 900, 2000 };
-int soundDurations_1[7] = { 6000000, 3000000, 6000000, 6000000, 6000000, 6000000, 6000000 };// premade sound 2
+int soundDurations_1[7] = { 6000000, 3000000, 6000000, 6000000, 6000000, 6000000, 6000000 };
 
 // premade sound 2
 int *soundTune_2[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
