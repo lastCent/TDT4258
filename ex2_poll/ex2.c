@@ -38,9 +38,10 @@ static int soundIntervals_3[7] = { 300, 400, 500, 600, 700, 800, 900 };
 static int soundDurations_3[7] = { 1000000, 2000000, 3000000, 1000000, 2000000, 3000000, 1000000 };
 
 // premade sound 4
-//static int *soundTune_4[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
-//static int soundIntervals_4[7] = { 100, 100, 100, 100, 100, 100, 100 };
-//static int soundDurations_4[7] = { 300, 300, 300, 300, 300, 300, 300 };
+// premade sound 4
+int *soundTune_4[7] = { saw, saw, saw, cosine, cosine, cosine, cosine};
+int soundIntervals_4[7] = { 2000, 2000, 2000, 400, 800, 400, 2000 };
+int soundDurations_4[7] = { 4000000, 4000000, 6000000, 2000000, 2000000, 2000000, 2000000 };
 
 
 int main(void)
@@ -50,6 +51,9 @@ int main(void)
 	setupDAC();
 	setupTimer(0);
 	// Looping to check for button presses
+	// Start sound
+	*GPIO_PA_DOUT = (0b00000000 << 8);
+	playSound(soundTune_4, 7, 16, soundIntervals_4, soundDurations_4);
 	while (1) {
 		// Light up LED's just as a visual aid
 		*GPIO_PA_DOUT = (*GPIO_PC_DIN << 8);
@@ -58,7 +62,7 @@ int main(void)
 		if ((temp & 0b1) == 0b1){
 		playSound(soundTune_1, 7, 16, soundIntervals_1, soundDurations_1);
 		}else if ((temp & 0b10) == 0b10){
-		playSound(soundTune_1, 7, 16, soundIntervals_1, soundDurations_1);
+		playSound(soundTune_4, 7, 16, soundIntervals_4, soundDurations_4);
 		}else if ((temp & 0b100) == 0b100){
 		playSound(soundTune_1, 7, 16, soundIntervals_1, soundDurations_1);
 		}else if ((temp & 0b1000)== 0b1000){

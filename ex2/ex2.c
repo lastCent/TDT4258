@@ -44,9 +44,9 @@ int soundIntervals_3[7] = { 300, 400, 500, 600, 700, 800, 900 };
 int soundDurations_3[7] = { 1000000, 2000000, 3000000, 1000000, 2000000, 3000000, 1000000 };
 
 // premade sound 4
-int *soundTune_4[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosine};
-int soundIntervals_4[7] = { 100, 100, 100, 100, 100, 100, 100 };
-int soundDurations_4[7] = { 300, 300, 300, 300, 300, 300, 300 };
+int *soundTune_4[7] = { saw, saw, saw, cosine, cosine, cosine, cosine};
+int soundIntervals_4[7] = { 2000, 2000, 2000, 400, 800, 400, 2000 };
+int soundDurations_4[7] = { 4000000, 4000000, 6000000, 2000000, 2000000, 2000000, 2000000 };
 
 int main(void)
 {
@@ -58,6 +58,8 @@ int main(void)
 	setupSCR(); 
 	setupNVIC();
 	// Main loop
+	// start sound
+	melody = 4;
 	while (1){
 		play(melody);	// Call play() to pick the correct premade melody
 		melody = 0;	// reset melody variable, changed by GPIO_EVEN_IRQHandler
@@ -98,6 +100,8 @@ void play(int melody){
 		playSound(soundTune_2, 7, 16, soundIntervals_2, soundDurations_2);
 	}else if (melody == 3){
 		playSound(soundTune_3, 7, 16, soundIntervals_3, soundDurations_3);
+	}else if (melody == 4){
+		playSound(soundTune_4, 7, 16, soundIntervals_4, soundDurations_4);
 	}
 }
 

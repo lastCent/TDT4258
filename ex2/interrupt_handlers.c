@@ -22,7 +22,7 @@ void __attribute__ ((interrupt)) GPIO_EVEN_IRQHandler()
 		melody = 1;	// Variable from ex2.c to play correct sound/melody
 	}else if ((temp & 0b10) == 0b10){
 		*GPIO_PA_DOUT = (*GPIO_PC_DIN << 8);
-		melody = 1;
+		melody = 4;
 	}else if ((temp & 0b100) == 0b100){
 		*GPIO_PA_DOUT = (*GPIO_PC_DIN << 8);
 		melody = 1;
