@@ -27,7 +27,10 @@ int sawInv[16] = { 1, 3, 5, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1 };    // Sawto
 int square[16] = { 1, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 1, 4, 4, 4, 4 };    // SquaRE
 int sqrWigl[16] = { 1, 2, 1, 2, 4, 5, 4, 5, 1, 2, 1, 2, 4, 5, 4, 5 };	// Wiggly square
 int low[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };       // none
+int hSpike[4] = {8, 7, 5, 1}; 						// retro sound
+
 // Define different sounds
+//------------------------
 // premade sound 1
 int *soundTune_1[7] = { sawInv, square, square, square, square, square, saw };
 int soundIntervals_1[7] = { 800, 800, 850, 800, 700, 900, 2000 };
@@ -43,14 +46,36 @@ int *soundTune_3[7] = { cosine, sqrWigl, cosine, sqrWigl, cosine, sqrWigl, cosin
 int soundIntervals_3[7] = { 300, 400, 500, 600, 700, 800, 900 };
 int soundDurations_3[7] = { 1000000, 2000000, 3000000, 1000000, 2000000, 3000000, 1000000 };
 
-// premade sound 4
-int *soundTune_4[7] = { saw, saw, saw, cosine, cosine, cosine, cosine};
-int soundIntervals_4[7] = { 2000, 2000, 2000, 400, 800, 400, 2000 };
-int soundDurations_4[7] = { 4000000, 4000000, 6000000, 2000000, 2000000, 2000000, 2000000 };
+// Start up melody, split into separate parts for the sake of formatting and easy configuration
+//---------------------------------------------------------------------------------------------
+// melody part1
+int *soundTune_4[12] = { hSpike, low, hSpike, low, hSpike, low};
+int soundIntervals_4[12] = { 6000, 6000,  8000, 8000, 6000, 6000};
+int soundDurations_4[12] = { 3500000, 1000000, 3500000, 1000000, 3500000, 1000000};
+
+// melody part1.5
+int *soundTune_5[6] = {hSpike, low, hSpike, low, hSpike, low};
+int soundIntervals_5[6] = {8000, 8000, 6000, 6000, 10000, 10000};
+int soundDurations_5[6] = {3500000, 1000000, 3500000, 1000000, 3500000, 1000000};
+
+// melody part2
+int *soundTune_6[4] = {hSpike, hSpike, hSpike, hSpike};
+int soundIntervals_6[4] = {5000, 4000, 6000, 8000};
+int soundDurations_6[4] = {2500000, 2500000, 2500000, 2500000};
+
+// melody part3
+int *soundTune_7[8] = {hSpike, low, hSpike, low, hSpike, low, hSpike, low};
+int soundIntervals_7[8] = {3000, 3000, 8000, 8000, 3250, 3250, 8000, 8000};
+int soundDurations_7[8] = {3500000, 1000000, 3500000, 1000000, 3500000, 1000000, 3500000, 1000000};
+
+//melody part3.5
+int *soundTune_8[8] = {hSpike, low, hSpike, low, hSpike, low, hSpike, low};
+int soundIntervals_8[8] = {3500, 3500, 8000, 8000, 5000, 5000, 8000, 8000};
+int soundDurations_8[8] = {3500000, 1000000, 3500000, 1000000, 3500000, 1000000, 3500000, 1000000};
+
 
 int main(void)
 {
-	
 	// Call the peripheral setup functions 
 	setupGPIO();
 	setupDAC();
@@ -81,7 +106,8 @@ void playWave(int *wavePtr, int size, int interval, int duration){
 	int timeLeft = duration;
 	while (timeLeft > 0) {
 		for (int i = 0; i < size; i++) {
-			// Feed DAC to play sound, wavePtr is a predefined amplitude array, Volume is used as a multiplier
+			// Feed DAC to play sound, wavePtr is a predefined amplitude array,
+			// Volume is used as a multiplier
 			*DAC0_CH0DATA = wavePtr[i] * volume;
 			*DAC0_CH1DATA = wavePtr[i] * volume;
 			setPeriod(interval);	// set TIMER1_TOP to correct interval
@@ -101,7 +127,16 @@ void play(int melody){
 	}else if (melody == 3){
 		playSound(soundTune_3, 7, 16, soundIntervals_3, soundDurations_3);
 	}else if (melody == 4){
-		playSound(soundTune_4, 7, 16, soundIntervals_4, soundDurations_4);
+		playSound(soundTune_4, 6, 4, soundIntervals_4, soundDurations_4);
+		playSound(soundTune_5, 6, 4, soundIntervals_5, soundDurations_5);
+		playSound(soundTune_6, 4, 4, soundIntervals_6, soundDurations_6);
+                playSound(soundTune_4, 6, 4, soundIntervals_4, soundDurations_4);
+                playSound(soundTune_5, 6, 4, soundIntervals_5, soundDurations_5);
+		playSound(soundTune_6, 4, 4, soundIntervals_6, soundDurations_6);
+		playSound(soundTune_7, 8, 4, soundIntervals_7, soundDurations_7);
+		playSound(soundTune_8, 8, 4, soundIntervals_8, soundDurations_8);
+		playSound(soundTune_7, 8, 4, soundIntervals_7, soundDurations_7);
+		playSound(soundTune_8, 8, 4, soundIntervals_8, soundDurations_8);
 	}
 }
 
