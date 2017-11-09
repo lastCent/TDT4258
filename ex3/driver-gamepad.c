@@ -8,6 +8,7 @@
 #include <linux/fs.h>  // Get device number
 #include <linux/cdev.h>  // For char dev registration
 #include <linux/device.h> // For device creation (c1)
+#include <asm/uaccess.h>  // Userspace read/write
 
 // DECLARE MEMORY LOCATIONS:
 // GPIO
@@ -26,13 +27,14 @@
 #define GPIO_PC_DIN      ((volatile uint32_t*)(GPIO_PC_BASE + 0x1c))
 #define GPIO_PC_PINLOCKN ((volatile uint32_t*)(GPIO_PC_BASE + 0x20))
 
-#define GPIO_EXTIPSELL ((volatile uint32_t*)(GPIO_PA_BASE + 0x100))
-#define GPIO_EXTIPSELH ((volatile uint32_t*)(GPIO_PA_BASE + 0x104))
-#define GPIO_EXTIRISE  ((volatile uint32_t*)(GPIO_PA_BASE + 0x108))
-#define GPIO_EXTIFALL  ((volatile uint32_t*)(GPIO_PA_BASE + 0x10c))
-#define GPIO_IEN       ((volatile uint32_t*)(GPIO_PA_BASE + 0x110))
-#define GPIO_IFC       ((volatile uint32_t*)(GPIO_PA_BASE + 0x11c))
+#define GPIO_EXTIPSELL ((volatile uint32_t*)(GPIO_BASE + 0x100))
+#define GPIO_EXTIPSELH ((volatile uint32_t*)(GPIO_BASE + 0x104))
+#define GPIO_EXTIRISE  ((volatile uint32_t*)(GPIO_BASE + 0x108))
+#define GPIO_EXTIFALL  ((volatile uint32_t*)(GPIO_BASE + 0x10c))
+#define GPIO_IEN       ((volatile uint32_t*)(GPIO_BASE + 0x110))
 #define GPIO_IF		   ((volatile uint32_t*)(GPIO_BASE + 0x114))
+#define GPIO_IFC       ((volatile uint32_t*)(GPIO_BASE + 0x11c))
+
 
 /*
  * Declare function prototypes
@@ -87,9 +89,16 @@ static int __init template_init(void)
 	if (IS_ERR(d1)) {
 		printk("d1 ERR \n");
 	}
-	// TODO: Allocate IO regions
-	//request_mem_region(GPIO_PC_BASE, 0x24, device_name);
-	// PortA? 
+	// Allocate IO regions
+	void* region;
+	region = request_mem_region(GPIO_PC_BASE, 0x24, device_name);
+	if (region == NULL) {
+		printk("ERROR, region 1 failed \n");
+	}
+	region = request_mem_region((int) GPIO_EXTIPSELL, 0x20, device_name); 
+	if (region ==NULL) {
+		printk("ERROR, region 2, failed \n");
+	}
 	// Perform GPIO setup
     *GPIO_PC_DOUT = 0xff; //Set pins to pull up
     *GPIO_PC_MODEL = 0x33333333; // set pins to input
@@ -123,12 +132,16 @@ static int my_release(struct inode *inode, struct file *filp)
 static ssize_t my_read(struct file *filp, char *buff, size_t count, loff_t *offp)
 {
 	// TODO: Let game retrieve button info
+	// Read GPIO buttons, put copy into userspace buffer
+	uint32_t outVal;
+	outVal = ~*GPIO_PC_DIN;
+	copy_to_user(buff, &outVal, sizeof(outVal)); 
 	return 0;
 }
 
 static ssize_t my_write(struct file *filp, const char *buff, size_t count, loff_t *offp)
 {
-	return 0;
+	return -1;
 }
 
 static void __exit template_cleanup(void)
@@ -156,7 +169,6 @@ void transfer_interrupt(unsigned long unused)
 	//Send ready-to-read signal to program (chap. 6)
 	//send_sig(SIGIO, task, 0);  //utdatert?
 	//TODO: Cleanup
-	//SIG_TEST = 44;
 	printk("DEBUG: Interrupt tasklet executed \n");
 		// TODO: flytt stuff ut herifra
 	out_signal.si_signo = SIGUSR1;

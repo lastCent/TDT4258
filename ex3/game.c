@@ -20,18 +20,21 @@ int main(int argc, char *argv[])
 	char command[50];
 	strcpy(command, "modprobe driver-gamepad");
 	system(command);
-	int test = open("/dev/GPIO", O_RDWR, (mode_t)0600);
-	printf("%d \n", test);
-	
+	// Save file descriptor (ID) to "test" if no error
+	int test = open("/dev/GPIO", O_RDWR, (mode_t)0600); //Sjekk om det er flaggene vi trenger
 	// Set SIGIO signal to trigger handler
 	struct sigaction GPIO_action = {}; 
 	GPIO_action.sa_handler = &GPIO_interrupt_handler; 
 	sigaction(SIGUSR1, &GPIO_action, NULL);
-		
+	
+	int testBuff;
+	testBuff = 0;
 	printf("Hello World, I'm game!\n");
 	while (1) {
-		printf("Game PID: %d \n", getpid());
-		sleep(1);
+		printf("Test: %d \n", test);
+		read(test, &testBuff, sizeof(int)); // Read from file descriptor "test", write to testBuff
+		printf("Read: %d \n", testBuff);
+		usleep(1000000);
 	}
 	exit(EXIT_SUCCESS);
 }
