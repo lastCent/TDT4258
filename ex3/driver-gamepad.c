@@ -30,72 +30,81 @@
 /*
  * Declare function prototypes
  */
-static int my_open (struct inode *, struct file *);
-static int my_release(struct inode *, struct file *);
-static ssize_t my_read(struct file *, char *, size_t, loff_t *);
-static ssize_t my_write(struct file *, const char *, size_t, loff_t *);
+static int GPIO_open (struct inode *, struct file *);
+static int GPIO_release(struct inode *, struct file *);
+static ssize_t GPIO_read(struct file *, char *, size_t, loff_t *);
+static ssize_t GPIO_write(struct file *, const char *, size_t, loff_t *);
 void transfer_interrupt(unsigned long);
 static irqreturn_t KERNEL_IRQ_HANDLER(int, void*);
 
 /*
  * Global variables: 
  */
-const char device_name[] = "GPIO";  // Name of driver
-//int *dev_num;
-dev_t *dev_num;  // Device ID, NULL if shared
-struct task_struct *task;  // Takes pid number of child process
-struct siginfo out_signal = {};  // Signal which is sent to userspace
+const char device_name[] = "GPIO";	// Name of driver
+dev_t *dev_num;  					// Device ID, NULL if shared
+struct task_struct *task;  			// Takes pid number of child process
+struct siginfo out_signal = {};  	// Signal which is sent to userspace
+static struct class* c1;  			// Device class
+static struct device* d1;  			// Device file
 
 // Supported file operations struct
 const struct file_operations fops = {
 	.owner = THIS_MODULE,
-	.open = my_open,
-	.release = my_release,
-	.read = my_read,
-	.write = my_write,
+	.open = GPIO_open,
+	.release = GPIO_release,
+	.read = GPIO_read,
+	.write = GPIO_write,
 };
-// Declare 2nd part of button interrupt handler
+// Declare 2nd part of interrupt handler
 DECLARE_TASKLET(button_pushed, transfer_interrupt, 0);
 
-static int __init template_init(void)
+static int __init GPIO_init(void)
 {
-	int err;  // Error checking variable
-	struct cdev *my_cdev;  // Kernel char device structure
-	static struct class* c1;
-	static struct device* d1;
+	int err;  				// Error checking variable
+	struct cdev *my_cdev;	// Kernel char device structure
 	// Allocate major number (id for device)
 	*dev_num = 0;  // Assign temporary value to please compiler
 	err = alloc_chrdev_region(dev_num, 0, 1, device_name); 
+	if (err) goto return_err;
 	// Register char device
 	my_cdev = cdev_alloc();
 	cdev_init(my_cdev, &fops);
 	err = cdev_add(my_cdev, *dev_num, 1);
+	if (err) goto unregister_dev;
 	// Make visible driver file in /dev/
 	c1 = class_create(THIS_MODULE, device_name);
 	if (IS_ERR(c1)) {
-		printk("c1 Err \n");
+		err = -1;
+		goto unregister_dev;
 	}
 	d1 = device_create(c1, NULL, *dev_num, NULL, device_name);
 	if (IS_ERR(d1)) {
-		printk("d1 ERR \n");
+		err = -1;
+		goto destroy_class;
 	}
 	// Define signal which is sent to userspace
 	out_signal.si_signo = SIGUSR1;
     out_signal.si_code = SI_KERNEL;
 	out_signal.si_int = SIGUSR1; 
 	return 0;
-}
-
-static void __exit template_cleanup(void)
-{
-	// Remove 
 	
-	// Free device number(s)
-	unregister_chrdev_region(0,1);
-	printk("Short life for a small module...\n");
+	// Cleanup functions:
+	destroy_class: class_destroy(c1);
+	unregister_dev: unregister_chrdev_region(*dev_num, 1);
+	return_err: return err;
 }
 
-static int my_open (struct inode *inode, struct file *filp) 
+static void __exit GPIO_cleanup(void)
+{
+	// Remove device file
+	device_destroy(c1, *dev_num);
+	// Remove class
+	class_destroy(c1);
+	// Free device (number)
+	unregister_chrdev_region(*dev_num, 1);
+}
+
+static int GPIO_open (struct inode *inode, struct file *filp) 
 {
 	int err;  // Error checking variable
 	void* region;  // request_mem_region error checking
@@ -105,11 +114,13 @@ static int my_open (struct inode *inode, struct file *filp)
 	region = request_mem_region(GPIO_PC_BASE, 0x24, device_name);
 	printk("DEBUG: Driver opened! :D \n");
 	if (region == NULL) {
-		printk("ERROR, region 1 failed \n");
+		err = -1;
+		goto return_err;
 	}
 	region = request_mem_region((int) GPIO_EXTIPSELL, 0x20, device_name); 
 	if (region ==NULL) {
-		printk("ERROR, region 2, failed \n");
+		err = -1;
+		goto release_reg1;
 	} 
 	// Perform GPIO setup
 	*GPIO_PC_DOUT = 0xff; 			//Set pins to pull up
@@ -120,12 +131,20 @@ static int my_open (struct inode *inode, struct file *filp)
 	// Request interrupts from kernel 
 	// TODO: Sett inn SA_INTERRUPT som flag?
 	err = request_irq(17, KERNEL_IRQ_HANDLER, 0, device_name, dev_num);
+	if (err) goto release_reg2;
 	err = request_irq(18, KERNEL_IRQ_HANDLER, 0, device_name, dev_num);
+	if (err) goto free_irq1;
 	printk("DEBUG: Open completed \n");
 	return 0;
+	
+	// Cleanup functions:
+	free_irq1: free_irq(17, dev_num);
+	release_reg2: release_mem_region((int) GPIO_EXTIPSELL, 0x20);
+	release_reg1: release_mem_region((int) GPIO_PC_BASE, 0x24);
+	return_err: return err;
 }
 
-static int my_release(struct inode *inode, struct file *filp) 
+static int GPIO_release(struct inode *inode, struct file *filp) 
 {
 	// Release interrupt lines
 	free_irq(17, dev_num);
@@ -136,16 +155,18 @@ static int my_release(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-static ssize_t my_read(struct file *filp, char *buff, size_t count, loff_t *offp)
+static ssize_t GPIO_read(struct file *filp, char *buff, size_t count, loff_t *offp)
 {
-	// Read GPIO buttons, put copy into userspace buffer
+	/*
+	 * Read GPIO buttons, put copy into userspace buffer
+	 */
 	uint32_t outVal;
-	outVal = *GPIO_PC_DIN;
+	outVal = ~*GPIO_PC_DIN;
 	copy_to_user(buff, &outVal, sizeof(outVal)); 
 	return 0;
 }
 
-static ssize_t my_write(struct file *filp, const char *buff, size_t count, loff_t *offp)
+static ssize_t GPIO_write(struct file *filp, const char *buff, size_t count, loff_t *offp)
 {
 	return -1;
 }
@@ -167,9 +188,9 @@ void transfer_interrupt(unsigned long unused)
 	send_sig_info(SIGUSR1, &out_signal, task);
 }
 
-module_init(template_init);
-module_exit(template_cleanup);
+module_init(GPIO_init);
+module_exit(GPIO_cleanup);
 
-MODULE_DESCRIPTION("Small module, demo only, not very useful.");
+MODULE_DESCRIPTION("Driver for the custom NTNU GPIO device");
 MODULE_LICENSE("GPL");
 
