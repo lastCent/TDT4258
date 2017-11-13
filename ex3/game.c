@@ -40,7 +40,7 @@ static void game_init(){
 	ball_position = 12920;  // 38560 approx middle
 	ball_dimensions[0] = 12; // Ball widht
 	ball_dimensions[1] = 12; // Ball height
-	player_move_mult = 10;
+	player_move_mult = 15;
 	int i;
 	for(i = 0; i < (sizeof(p_offset) / sizeof(*p_offset)); i++){
 		p_offset[i] = 320 * i;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	printf("Hello World, I'm game!\n");
 	test = 1;
 	while (1) {
-		usleep(100000);
+		//usleep(1000000);
 		tick();
 	}
 	exit(EXIT_SUCCESS);
@@ -133,11 +133,11 @@ static void draw_map(){
 	int j;
 	
 	// Turn screen black
-	/*
+	
 	for (i = 0; i < 320*240; i++){
 		map[i] = 0x0;
 	}
-	*/
+	/*
 	// Add blackie for the players
 	for(i = 0; i < width; i++){
 		for(j = 0; j < 240; j++){
@@ -146,12 +146,12 @@ static void draw_map(){
 		}
 	}
 	// Add blackie for the ball
-	for(i = 0; i < ball_dimensions[0]; i++){
-		for(j = 0; j < ball_dimensions[1]; j++){
+	for(i = -2; i <= ball_dimensions[0] + 2; i++){
+		for(j = -2; j <= ball_dimensions[1] + 2; j++){
 			map[old_ball_position + i * 320 + j] = 0x0;
 		}
 	}
-	
+	*/
 	// Add whitie for the players
 	for(i = 0; i < width; i++){
 		for(j = 0; j < (sizeof(p_offset) / sizeof(*p_offset)); j++){
@@ -160,11 +160,26 @@ static void draw_map(){
 		}
 	}
 	// Add whitie for the ball
-	for(i = 1; i < ball_dimensions[0]; i++){
-		for(j = 1; j < ball_dimensions[1]; j++){
-			map[ball_position + i * 320 + j] = 0xffff;
+	for(i = 0; i <= ball_dimensions[0]; i++){
+		for(j = 0; j <= ball_dimensions[1]; j++){
+			map[ball_position + i + 320 * j] = 0xffff;
 		}
 	}
+	/*
+	// remove ball old ball
+	rect.dx = (old_ball_position % 320);
+	rect.dy = (old_ball_position / 320);
+	rect.width = ball_dimensions[0];
+	rect.height = ball_dimensions[1];
+	ioctl(fbfd, 0x4680, &rect);
+	
+	// draw ball
+	rect.dx = (ball_position % 320);
+	rect.dy = (ball_position / 320);
+	rect.width = ball_dimensions[0];
+	rect.height = ball_dimensions[1];
+	ioctl(fbfd, 0x4680, &rect);
+	
 	// Draw player1
 	rect.dx = y_player1 % 320;
 	rect.dy = 0;
@@ -178,21 +193,13 @@ static void draw_map(){
 	rect.width = width;
 	rect.height = 240;
 	ioctl(fbfd, 0x4680, &rect);
-	
-	// remove ball old ball
-	rect.dx = (old_ball_position % 320);
-	rect.dy = (old_ball_position / 320);
-	rect.width = ball_dimensions[0];
-	rect.height = ball_dimensions[1];
+	*/
+	rect.dx = 0;
+	rect.dy = 0;
+	rect.width = 320;
+	rect.height = 240;
 	ioctl(fbfd, 0x4680, &rect);
 	
-	// draw ball
-	rect.dx = ball_position % 320;
-	rect.dy = ball_position / 320;
-	rect.width = ball_dimensions[0];
-	rect.height = ball_dimensions[1];
-	ioctl(fbfd, 0x4680, &rect);
-
 }
 static void move_ball(){
 
