@@ -161,7 +161,7 @@ static ssize_t GPIO_read(struct file *filp, char *buff, size_t count, loff_t *of
 	 * Read GPIO buttons, put copy into userspace buffer
 	 */
 	uint32_t outVal;
-	outVal = ~*GPIO_PC_DIN;
+	outVal = *GPIO_PC_DIN;
 	copy_to_user(buff, &outVal, sizeof(outVal)); 
 	return 0;
 }
