@@ -295,25 +295,22 @@ static void move_ball(){
 	}
 	
 	// check winning: check if any parts of the top part of the ball hits any of the end walls
-	int k;
 	for (i = 0; i < 240; i++){
-		for (k = 0; k <= 1; k++){
-			int left_side = 0 + k + 320 * i;
-			int right_side = 319 - k + 320 * i;
-			for (j = 0; j <= ball_dimensions[0]; j++){
-				int temp_ball_pos = ball_position + j;
-				if(temp_ball_pos == left_side){
-					// player 2 won
-					game_over = 1;
-					player_win[1] = 1;
-					return;
-				}
-				if(temp_ball_pos == right_side){
-					// player 1 won
-					game_over = 1;
-					player_win[0] = 1;
-					return;
-				}
+		int left_side = 0 + 320 * i;
+		int right_side = 319 + 320 * i;
+		for (j = 0; j <= ball_dimensions[0]; j++){
+			int temp_ball_pos = ball_position + j;
+			if(temp_ball_pos == left_side){
+				// player 2 won
+				game_over = 1;
+				player_win[1] = 1;
+				return;
+			}
+			if(temp_ball_pos == right_side){
+				// player 1 won
+				game_over = 1;
+				player_win[0] = 1;
+				return;
 			}
 		}
 	}
