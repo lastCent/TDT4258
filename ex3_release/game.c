@@ -76,7 +76,7 @@ static void GPIO_interrupt_handler(int unused)
 	}
 	
 	// check if button 2 is pressed
-	if ((~buff & 0b10) == 2){
+	if ((~buff & 0b10) == 0b10){
 		// check if the new movement goes out of bound
 		if (y_player1 - 320 * player_move_mult > 0){
 			y_player1 -= 320 * player_move_mult;
@@ -84,13 +84,14 @@ static void GPIO_interrupt_handler(int unused)
 	}
 	
 	// check if button 4 is pressed
-	if ((~buff & 0b1000) == 8){
+	if ((~buff & 0b1000) == 0b1000){
 		// check if new movement goes out of bound
 		if (y_player1 + 320 * (sizeof(p_offset) / sizeof(*p_offset)) + (320 * player_move_mult) <= 76800 + 320 * player_move_mult){
 			y_player1 += 320 * player_move_mult;
 		}	
 	
 	}
+	
 	// check if button 6 is pressed
 	if((~buff & 0b100000) == 0b100000){
 	 	// check if new movement goes out of bound
@@ -98,6 +99,7 @@ static void GPIO_interrupt_handler(int unused)
 			y_player2 -= 320 * player_move_mult;
 		}	
 	}
+	
 	// check if button 8 is pressed
 	if((~buff & 0b10000000) == 0b10000000){
 		// check if new movement goes out of bound
@@ -121,12 +123,10 @@ int main(int argc, char *argv[])
 	strcpy(command2, "modprobe driver-sound");
 	system(command2);
 	
-	gamepad_driver = open("/dev/GPIO", O_RDWR, (mode_t)0600);
+	gamepad_driver = open("/dev/gamepad", O_RDWR, (mode_t)0600);
 	sound_driver = open("/dev/SOUND", O_RDWR, (mode_t)0600);
 	
-	
-	//printf("%d \n", gamepad_driver);
-	// enable interrupt as setup is rdy
+	// enable interrupt as setup is ready
 	interrupt_enabled = 1;
 	
 	// setup mmap
@@ -135,30 +135,30 @@ int main(int argc, char *argv[])
 	
 	// setup game
 	game_init();
+	
 	// time vars for "wait"
 	struct timeval t0;
 	struct timeval t1;
 	float elapsed;
+	
 	// main loop
 	while (1) {
 		gettimeofday(&t0, 0);
 		while(1){
 			gettimeofday(&t1, 0);
 			elapsed = (t1.tv_sec - t0.tv_sec) * 1000.0f + (t1.tv_usec - t0.tv_usec) / 1000.0f;
-			
 			// check elapsed time, and break if more than cond. this is in milliseconds
 			if(elapsed > 80){
 				break;
 			}
+			
 		}
 		// if game not over, tick/update
 		if (!game_over){
 			tick();
 		}else{
-		
-			write(sound_driver, 0, 5); // Play end tune
-			
 			// game is over, therefore wait for 3 seconds and then reset game
+			write(sound_driver, 0, 5); // Play end tune
 			gettimeofday(&t0, 0);
 			while(1){
 				gettimeofday(&t1, 0);
@@ -201,12 +201,10 @@ static void draw_map(){
 				// player 1 won, player1 = green, player2 = red
 				map[y_player1 + i + p_offset[j]] = 0x07E0;
 				map[y_player2 + i + p_offset[j]] = 0x7800;
-				//printf("player 1");
 			}else if (player_win[1]){
 				// player 2 won, player1 = red, player 2, green
 				map[y_player1 + i + p_offset[j]] = 0x7800;
 				map[y_player2 + i + p_offset[j]] = 0x07E0;
-				//printf("player 2");
 			}else{
 				// no one won yet, keep em white
 				map[y_player1 + i + p_offset[j]] = 0xffff;
@@ -250,9 +248,7 @@ static void move_ball(){
 	temp_ball_pos_roof -= ball_direction[0] + ball_direction[1] * 320;
 	int temp_ball_pos_floor = temp_ball_pos_roof + 320 * (ball_dimensions[1] - 5);
 	if ((temp_ball_pos_roof < 320) || (temp_ball_pos_floor > 76800)){
-		
 		write(sound_driver, 0, 3); // play bounce sound
-		
 		// change direction of y value, ie direction from up to down, vice-versa
 		ball_direction[1] *= -1;
 		
@@ -279,7 +275,6 @@ static void move_ball(){
 			player_1_pos = y_player1 + width + 320 * j;
 			player_2_pos = y_player2 + 320 * j;
 			if ((ball_top == player_1_pos) || (ball_top == player_2_pos) || (ball_bottom == player_1_pos) || (ball_bottom == player_2_pos)){
-			
 				// change the direction of the x value, ie direction from right to left, vice-versa
 				write(sound_driver, 0, 3); // play bounce sound
 				ball_direction[0] *= -1;
@@ -313,6 +308,7 @@ static void move_ball(){
 				return;
 			}
 		}
+		
 	}
 
 	//No collision
