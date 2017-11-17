@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 	strcpy(command2, "modprobe driver-sound");
 	system(command2);
 	
-	gamepad_driver = open("/dev/GPIO", O_RDWR, (mode_t)0600);
+	gamepad_driver = open("/dev/gamepad", O_RDWR, (mode_t)0600);
 	sound_driver = open("/dev/SOUND", O_RDWR, (mode_t)0600);
 	
 	// enable interrupt as setup is ready
@@ -149,6 +149,7 @@ int main(int argc, char *argv[])
 			if(elapsed > 80){
 				break;
 			}
+			
 		}
 		// if game not over, tick/update
 		if (!game_over){
@@ -305,6 +306,7 @@ static void move_ball(){
 				return;
 			}
 		}
+		
 	}
 
 	//No collision
