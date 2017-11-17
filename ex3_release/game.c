@@ -91,6 +91,7 @@ static void GPIO_interrupt_handler(int unused)
 		}	
 	
 	}
+	
 	// check if button 6 is pressed
 	if((~buff & 0b100000) == 0b100000){
 	 	// check if new movement goes out of bound
@@ -98,6 +99,7 @@ static void GPIO_interrupt_handler(int unused)
 			y_player2 -= 320 * player_move_mult;
 		}	
 	}
+	
 	// check if button 8 is pressed
 	if((~buff & 0b10000000) == 0b10000000){
 		// check if new movement goes out of bound
