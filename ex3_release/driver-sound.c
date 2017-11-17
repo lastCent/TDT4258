@@ -34,7 +34,7 @@
 #define TIMER3_IFC ((volatile uint32_t*)(TIMER3_BASE + 0x18))
 #define TIMER3_TOP ((volatile uint32_t*)(TIMER3_BASE + 0x1c))
 #define TIMER3_CNT ((volatile uint32_t*)(TIMER3_BASE + 0x24))
-#define TIMER3_IF  ((volatile uint32_t*)(TIMER3_BASE + 0x10)
+#define TIMER3_IF  ((volatile uint32_t*)(TIMER3_BASE + 0x10))
 
 /*
  * Define premade waves
@@ -112,7 +112,6 @@ volatile bool next;
 const char device_name[] = "SOUND";		// Name of driver
 dev_t *dev_num; 				// Device ID, NULL if shared
 static int majorNumber;				// The driver instance's major number
-struct task_struct *task;  			// Takes pid number of child process
 static struct class* c1;  			// Device class
 static struct device* d1;  			// Device file
 
@@ -188,9 +187,6 @@ static int SOUND_open (struct inode *inode, struct file *filp)
 	int err;	// Error checking variable
 	void* region; 	// request_mem_region error checking
 	
-	// Register client process
-	task = current;
-	
 	// Allocate IO regions
 	region = request_mem_region(TIMER3_BASE, 0x24, device_name);
 	if (region == NULL) 
@@ -199,7 +195,7 @@ static int SOUND_open (struct inode *inode, struct file *filp)
 		goto return_err;
 	}
 	region = request_mem_region((int) DAC0_BASE2, 0x24, device_name); 
-	if (region ==NULL) 
+	if (region == NULL) 
 	{
 		err = -1;
 		goto release_reg1;
@@ -218,11 +214,9 @@ static int SOUND_open (struct inode *inode, struct file *filp)
 	// Request interrupts from kernel 
 	err = request_irq(19, KERNEL_IRQ_HANDLER, 0, device_name, dev_num);
 	if (err) goto release_reg2;
-	if (err) goto free_irq1;
 	return 0;
 	
 	// Cleanup functions:
-	free_irq1: free_irq(19, dev_num);
 	release_reg2: release_mem_region((int) TIMER3_BASE, 0x24);
 	release_reg1: release_mem_region((int) DAC0_BASE2, 0x24);
 	return_err: return err;
