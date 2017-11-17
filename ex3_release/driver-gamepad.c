@@ -159,8 +159,8 @@ static int gamepad_open (struct inode *inode, struct file *filp)
 	// Cleanup functions:
 	free_irq1: free_irq(17, dev_num); free_irq(18, dev_num);
 	release_reg2: release_mem_region((int) GPIO_EXTIPSELL, 0x20);
-	undo_GPIO:	*GPIO_PC_DOUT = 0; *GPIO_PC_MODEL = 0; *GPIO_EXTIPSELL = 0;
-        		*GPIO_EXTIFALL = 0; *GPIO_IEN = 0;
+		*GPIO_PC_DOUT = 0; *GPIO_PC_MODEL = 0; *GPIO_EXTIPSELL = 0;
+        	*GPIO_EXTIFALL = 0; *GPIO_IEN = 0;
 	release_reg1: release_mem_region((int) GPIO_PC_BASE, 0x24);
 	return_err: return err;
 }
