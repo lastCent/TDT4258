@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 	strcpy(command2, "modprobe driver-sound");
 	system(command2);
 	
-	gamepad_driver = open("/dev/GPIO", O_RDWR, (mode_t)0600);
+	gamepad_driver = open("/dev/gamepad", O_RDWR, (mode_t)0600);
 	sound_driver = open("/dev/SOUND", O_RDWR, (mode_t)0600);
 	
 	
@@ -146,10 +146,14 @@ int main(int argc, char *argv[])
 			gettimeofday(&t1, 0);
 			elapsed = (t1.tv_sec - t0.tv_sec) * 1000.0f + (t1.tv_usec - t0.tv_usec) / 1000.0f;
 			
+			
+			
+			
 			// check elapsed time, and break if more than cond. this is in milliseconds
 			if(elapsed > 80){
 				break;
 			}
+			
 		}
 		// if game not over, tick/update
 		if (!game_over){
@@ -313,6 +317,7 @@ static void move_ball(){
 				return;
 			}
 		}
+		
 	}
 
 	//No collision
