@@ -115,15 +115,12 @@ int main(int argc, char *argv[])
 	struct sigaction GPIO_action = {}; 
 	GPIO_action.sa_handler = &GPIO_interrupt_handler; 
 	sigaction(SIGUSR1, &GPIO_action, NULL);
-	
 	char command1[50];
 	strcpy(command1, "modprobe driver-gamepad");
 	system(command1);
-	printf("gamepad driver loaded");
 	char command2[50];
 	strcpy(command2, "modprobe driver-sound");
 	system(command2);
-	printf("audio driver loaded");
 	
 	gamepad_driver = open("/dev/Gamepad", O_RDWR, (mode_t)0600);
 	sound_driver = open("/dev/SOUND", O_RDWR, (mode_t)0600);
